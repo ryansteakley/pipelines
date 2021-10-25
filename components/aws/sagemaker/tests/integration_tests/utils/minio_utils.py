@@ -19,10 +19,12 @@ def get_artifact_in_minio(workflow_json, step_name, artifact_name, output_dir):
     minio_access_key = "minio"
     minio_secret_key = "minio123"
     minio_port = utils.get_minio_service_port()
+    print(workflow_json)
     for node in workflow_json["status"]["nodes"].values():
         if step_name in node["name"] and node["type"] != "DAG":
             for artifact in node["outputs"]["artifacts"]:
                 if artifact["name"] == artifact_name:
+                    print(artifact)
                     s3_data = artifact["s3"]
     minio_client = Minio(
         "localhost:{}".format(minio_port),
