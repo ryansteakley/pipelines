@@ -7,21 +7,21 @@ RUN apt-get update --allow-releaseinfo-change && apt-get install -y --no-install
     jq
 
 # Install eksctl
-RUN curl --location "https://github.com/weaveworks/eksctl/releases/download/0.43.0/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp \
- && mv /tmp/eksctl /usr/local/bin
+RUN curl --location "https://github.com/weaveworks/eksctl/releases/download/0.71.0/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp \
+    && mv /tmp/eksctl /usr/local/bin
 
 # Install aws-iam-authenticator
 RUN curl -S -o /usr/local/bin/aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.16.8/2020-04-16/bin/linux/amd64/aws-iam-authenticator \
- && chmod +x /usr/local/bin/aws-iam-authenticator
+    && chmod +x /usr/local/bin/aws-iam-authenticator
 
 # Install Kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl \
- && chmod +x ./kubectl \
- && mv ./kubectl /usr/local/bin/kubectl
+    && chmod +x ./kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl
 
 # Install Argo CLI
 RUN curl -sSL -o /usr/local/bin/argo https://github.com/argoproj/argo-workflows/releases/download/v2.8.0/argo-linux-amd64 \
- && chmod +x /usr/local/bin/argo
+    && chmod +x /usr/local/bin/argo
 
 # Copy conda environment early to avoid cache busting
 COPY ./components/aws/sagemaker/tests/integration_tests/environment.yml environment.yml
