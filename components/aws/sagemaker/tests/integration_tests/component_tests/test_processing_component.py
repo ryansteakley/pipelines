@@ -116,8 +116,9 @@ def test_terminate_processingjob(kfp_client, experiment_id, region, sagemaker_cl
 
     print(f"Terminating run: {run_id} where Processing job_name: {input_job_name}")
     kfp_client_utils.terminate_run(kfp_client, run_id)
-
-    response = sagemaker_utils.describe_processing_job(sagemaker_client, input_job_name)
-    assert response["ProcessingJobStatus"] in ["Stopping", "Stopped"]
-
+    def callback():
+        response = sagemaker_utils.describe_processing_job(sagemaker_client, input_job_name)
+        assert response["ProcessingJobStatus"] in ["Stopping", "Stopped"]
+        return response
+    sagemaker_utils.wait_for(callback,600)
     utils.remove_dir(download_dir)

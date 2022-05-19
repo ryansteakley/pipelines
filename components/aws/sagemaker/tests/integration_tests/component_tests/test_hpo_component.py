@@ -135,8 +135,10 @@ def test_terminate_hpojob(kfp_client, experiment_id, region, sagemaker_client):
 
     print(f"Terminating run: {run_id} where HPO job_name: {input_job_name}")
     kfp_client_utils.terminate_run(kfp_client, run_id)
-
-    response = sagemaker_utils.describe_hpo_job(sagemaker_client, input_job_name)
-    assert response["HyperParameterTuningJobStatus"] in ["Stopping", "Stopped"]
+    def callback():
+        response = sagemaker_utils.describe_hpo_job(sagemaker_client, input_job_name)
+        assert response["HyperParameterTuningJobStatus"] in ["Stopping", "Stopped"]
+        return response
+    sagemaker_utils.wait_for(callback,600)
 
     utils.remove_dir(download_dir)

@@ -1,7 +1,7 @@
 import logging
 import re
+import time
 from datetime import datetime
-from time import sleep
 
 
 def describe_training_job(client, training_job_name):
@@ -85,3 +85,21 @@ def stop_labeling_job(client, labeling_job_name):
 
 def describe_processing_job(client, processing_job_name):
     return client.describe_processing_job(ProcessingJobName=processing_job_name)
+
+
+def wait_for(callback, timeout=300, interval=30):
+    """
+    Provide a function with no arguments as a callback.
+    Repeatedly calls the callback on an interval until the timeout duration
+    or until the callback returns without raising an exception.
+    If the timeout duration is exceeded raises the last raised exception
+    """
+
+    start = time.time()
+    while True:
+        try:
+            return callback()
+        except Exception as e:
+            if time.time() - start >= timeout:
+                raise e
+            time.sleep(interval)

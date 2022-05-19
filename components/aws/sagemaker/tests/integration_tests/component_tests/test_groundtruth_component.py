@@ -106,10 +106,13 @@ def test_groundtruth_labeling_job(
             f"Terminating run: {run_id} where GT job_name: {ground_truth_train_job_name}"
         )
         kfp_client_utils.terminate_run(kfp_client, run_id)
-        response = sagemaker_utils.describe_labeling_job(
-            sagemaker_client, ground_truth_train_job_name
-        )
-        assert response["LabelingJobStatus"] in ["Completed", "Stopping", "Stopped"]
+        def callback():
+            response = sagemaker_utils.describe_labeling_job(
+                sagemaker_client, ground_truth_train_job_name
+            )
+            assert response["LabelingJobStatus"] in ["Completed", "Stopping", "Stopped"]
+            return response
+        sagemaker_utils.wait_for(callback,600)
     finally:
         print(
             f"Clean up workteam: {workteam_arn} and GT job: {ground_truth_train_job_name}"
