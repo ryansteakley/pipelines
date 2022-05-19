@@ -128,6 +128,6 @@ def test_terminate_trainingjob(kfp_client, experiment_id, sagemaker_client):
             sagemaker_client, input_job_name)
         assert response["TrainingJobStatus"] in ["Stopping", "Stopped"]
         return response
-    sagemaker_utils.wait_for(callback, 30)
+    sagemaker_utils.wait_for(callback)
 
     utils.remove_dir(download_dir)

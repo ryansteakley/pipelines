@@ -112,7 +112,7 @@ def test_groundtruth_labeling_job(
             )
             assert response["LabelingJobStatus"] in ["Completed", "Stopping", "Stopped"]
             return response
-        sagemaker_utils.wait_for(callback,30)
+        sagemaker_utils.wait_for(callback)
     finally:
         print(
             f"Clean up workteam: {workteam_arn} and GT job: {ground_truth_train_job_name}"

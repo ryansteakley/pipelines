@@ -124,5 +124,5 @@ def test_terminate_transformJob(kfp_client, experiment_id, region, sagemaker_cli
         response = sagemaker_utils.describe_transform_job(sagemaker_client, input_job_name)
         assert response["TransformJobStatus"] in ["Stopping", "Stopped"]
         return response
-    sagemaker_utils.wait_for(callback,30)
+    sagemaker_utils.wait_for(callback)
     utils.remove_dir(download_dir)
