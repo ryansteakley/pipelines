@@ -39,7 +39,8 @@ def test_transform_job(
     test_params["Arguments"]["model_name"] = test_params["Arguments"][
         "job_name"
     ] = input_job_name = (
-        utils.generate_random_string(5) + "-" + test_params["Arguments"]["model_name"]
+        utils.generate_random_string(
+            5) + "-" + test_params["Arguments"]["model_name"]
     )
     print(f"running test with model/job name: {input_job_name}")
 
@@ -65,7 +66,8 @@ def test_transform_job(
     )
 
     # Verify Job was successful on SageMaker
-    response = sagemaker_utils.describe_transform_job(sagemaker_client, input_job_name)
+    response = sagemaker_utils.describe_transform_job(
+        sagemaker_client, input_job_name)
     assert response["TransformJobStatus"] == "Completed"
     assert response["TransformJobName"] == input_job_name
 
@@ -79,7 +81,8 @@ def test_transform_job(
     # URI is following format s3://<bucket_name>/relative/path/to/file
     # split below is to extract the part after bucket name
     file_key = os.path.join(
-        "/".join(output_location.split("/")[3:]), test_params["ExpectedOutputFile"]
+        "/".join(output_location.split("/")
+                 [3:]), test_params["ExpectedOutputFile"]
     )
     assert s3_utils.check_object_exists(s3_client, s3_data_bucket, file_key)
 
@@ -118,11 +121,15 @@ def test_terminate_transformJob(kfp_client, experiment_id, region, sagemaker_cli
         "running",
     )
 
-    print(f"Terminating run: {run_id} where Transform job_name: {input_job_name}")
+    print(
+        f"Terminating run: {run_id} where Transform job_name: {input_job_name}")
     kfp_client_utils.terminate_run(kfp_client, run_id)
+
     def callback():
-        response = sagemaker_utils.describe_transform_job(sagemaker_client, input_job_name)
-        assert response["TransformJobStatus"] in ["Stopping", "Stopped"]
+        response = sagemaker_utils.describe_transform_job(
+            sagemaker_client, input_job_name)
+        assert response["TransformJobStatus"] in [
+            "Completed", "Stopping", "Stopped"]
         return response
     sagemaker_utils.wait_for(callback)
     utils.remove_dir(download_dir)

@@ -113,7 +113,7 @@ def test_terminate_trainingjob(kfp_client, experiment_id, region, sagemaker_clie
     kfp_client_utils.terminate_run(kfp_client, run_id)
     def callback():
         response = sagemaker_utils.describe_training_job(sagemaker_client, input_job_name)
-        assert response["TrainingJobStatus"] in ["Stopping", "Stopped"]
+        assert response["TrainingJobStatus"] in ["Completed","Stopping", "Stopped"]
         return response
     sagemaker_utils.wait_for(callback)
 
