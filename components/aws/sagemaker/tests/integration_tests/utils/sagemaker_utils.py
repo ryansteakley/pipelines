@@ -87,7 +87,7 @@ def describe_processing_job(client, processing_job_name):
     return client.describe_processing_job(ProcessingJobName=processing_job_name)
 
 
-def wait_for(callback, timeout=300, interval=10):
+def wait_for(callback, timeout=600, interval=10):
     """
     Provide a function with no arguments as a callback.
     Repeatedly calls the callback on an interval until the timeout duration
