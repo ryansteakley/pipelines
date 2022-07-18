@@ -16,7 +16,6 @@
 source_root=$(pwd)
 
 python3 -m pip install --upgrade pip
-python3 -m pip install yapf==0.32.0
+python3 -m pip install $(grep 'isort==' sdk/python/requirements-dev.txt)
 
-# Testing the component authoring library
-yapf --recursive "${source_root}/sdk/python"
+isort --check --profile google "${source_root}/sdk/python" --skip "${source_root}/sdk/python/kfp/deprecated"
