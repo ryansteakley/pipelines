@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3.7.*
-  - pip=20.0.*
+  - pip=22.0.*
   - awscli=1.18.141
   - boto3=1.15.0
   - pytest-xdist=2.1.0
@@ -14,7 +14,7 @@ dependencies:
   - filelock=3.0.*
   - pip:
     - kubernetes==11.0.*
-    - kfp==2.0.0-alpha.3
+    - kfp==2.0.*
     - minio==5.0.10
     - sagemaker==2.1.*
     - ruamel.yaml==0.16.*

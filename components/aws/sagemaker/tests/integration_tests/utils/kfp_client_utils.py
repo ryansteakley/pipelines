@@ -15,7 +15,7 @@ def compile_and_run_pipeline(
 ):
     pipeline_path = os.path.join(output_file_dir, pipeline_name)
     utils.run_command(
-        f"kfp dsl-compile --py {pipeline_definition} --output {pipeline_path}.yaml"
+        f"dsl-compile --py {pipeline_definition} --output {pipeline_path}.yaml"
     )
     run = client.run_pipeline(
         experiment_id, pipeline_name, f"{pipeline_path}.yaml", input_params
