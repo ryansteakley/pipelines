@@ -69,6 +69,7 @@ if ["${BUILD_V2}" == "true"]; then
 	docker build . -f v2.Dockerfile -t "${FULL_VERSION_IMAGE}"
 else
 	docker build . -f Dockerfile -t "${FULL_VERSION_IMAGE}"
+fi
 
 # Get the minor and major versions
 [[ $FULL_VERSION_TAG =~ ^[0-9]+\.[0-9]+ ]] && MINOR_VERSION_IMAGE="${REMOTE_REPOSITORY}:${BASH_REMATCH[0]}"
