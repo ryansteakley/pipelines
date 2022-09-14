@@ -69,6 +69,8 @@ if [ "${BUILD_V2}" == "true" ]; then
 	DOCKER_BUILDKIT=1
 	docker build . -f v2.Dockerfile -t "${FULL_VERSION_IMAGE}"
 else
+	echo "BUILDING V1"
+	echo "${BUILD_V2}"
 	docker build . -f Dockerfile -t "${FULL_VERSION_IMAGE}"
 fi
 
