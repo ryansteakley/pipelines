@@ -19,7 +19,7 @@ FULL_VERSION_TAG="9.1.9"
 BUILD_V2="false"
 DOCKER_CONFIG_PATH=${DOCKER_CONFIG_PATH:-"/root/.docker"}
 
-while getopts ":d:v:b:" opt; do
+while getopts ":d:v:build-v2:" opt; do
 	case ${opt} in
 		d)
 			if [[ "${OPTARG}" = "false" ]]; then
@@ -31,7 +31,7 @@ while getopts ":d:v:b:" opt; do
 		v)
 			FULL_VERSION_TAG="${OPTARG}"
 			;;
-		b)
+		build-v2)
 			if [[ "${OPTARG}" = "false" ]]; then
 				BUILD_V2="false"
 			else
