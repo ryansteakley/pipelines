@@ -16,7 +16,6 @@ set -e
 REMOTE_REPOSITORY="public.ecr.aws/kubeflow-on-aws/aws-sagemaker-kfp-components"
 DRYRUN="true"
 FULL_VERSION_TAG="9.1.9"
-BUILD_V2="false"
 DOCKER_CONFIG_PATH=${DOCKER_CONFIG_PATH:-"/root/.docker"}
 
 while getopts ":d:v:" opt; do
