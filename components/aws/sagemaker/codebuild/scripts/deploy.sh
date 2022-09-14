@@ -19,7 +19,7 @@ FULL_VERSION_TAG="9.1.9"
 BUILD_V2="false"
 DOCKER_CONFIG_PATH=${DOCKER_CONFIG_PATH:-"/root/.docker"}
 
-while getopts ":d:v:build-v2:" opt; do
+while getopts ":d:v:b:" opt; do
 	case ${opt} in
 		d)
 			if [[ "${OPTARG}" = "false" ]]; then
@@ -31,7 +31,7 @@ while getopts ":d:v:build-v2:" opt; do
 		v)
 			FULL_VERSION_TAG="${OPTARG}"
 			;;
-		build-v2)
+		b)
 			if [[ "${OPTARG}" = "false" ]]; then
 				BUILD_V2="false"
 			else
@@ -72,11 +72,11 @@ echo "Deploying version ${FULL_VERSION_TAG}"
 FULL_VERSION_IMAGE="${REMOTE_REPOSITORY}:${FULL_VERSION_TAG}"
 
 if [ "${BUILD_V2}" == "true" ]; then
-    echo "BUILDING V2"
+    echo "Building V2 image"
 	DOCKER_BUILDKIT=1
 	docker build . -f v2.Dockerfile -t "${FULL_VERSION_IMAGE}"
 else
-	echo "BUILDING V1"
+	echo "Building V1 image "
 	echo "${BUILD_V2}"
 	docker build . -f Dockerfile -t "${FULL_VERSION_IMAGE}"
 fi
