@@ -16,7 +16,7 @@ set -e
 REMOTE_REPOSITORY="public.ecr.aws/kubeflow-on-aws/aws-sagemaker-kfp-components"
 DRYRUN="true"
 FULL_VERSION_TAG="9.1.9"
-BUILD_V2="false"
+BUILD_VERSION="v1"
 DOCKER_CONFIG_PATH=${DOCKER_CONFIG_PATH:-"/root/.docker"}
 
 while getopts ":d:v:b:" opt; do
@@ -32,11 +32,7 @@ while getopts ":d:v:b:" opt; do
 			FULL_VERSION_TAG="${OPTARG}"
 			;;
 		b)
-			if [[ "${OPTARG}" = "false" ]]; then
-				BUILD_V2="false"
-			else
-				BUILD_V2="true"
-			fi
+			BUILD_VERSION="${OPTARG}"
 			;;
 	esac
 done
@@ -71,13 +67,12 @@ echo "Deploying version ${FULL_VERSION_TAG}"
 # Build the image
 FULL_VERSION_IMAGE="${REMOTE_REPOSITORY}:${FULL_VERSION_TAG}"
 
-if [ "${BUILD_V2}" == "true" ]; then
+if [ "${BUILD_VERSION}" == "v2" ]; then
     echo "Building V2 image"
 	DOCKER_BUILDKIT=1
 	docker build . -f v2.Dockerfile -t "${FULL_VERSION_IMAGE}"
 else
-	echo "Building V1 image "
-	echo "${BUILD_V2}"
+	echo "Building V1 image"
 	docker build . -f Dockerfile -t "${FULL_VERSION_IMAGE}"
 fi
 
