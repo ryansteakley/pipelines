@@ -52,7 +52,7 @@ func OpenBucket(ctx context.Context, k8sClient kubernetes.Interface, namespace s
 	}()
 	if config.Scheme == "minio://" {
 		cred, err := getMinioCredential(ctx, k8sClient, namespace)
-		creds := cwwdaredentials.NewStaticCredentials(cred.AccessKey, cred.SecretKey, "")
+		creds := credentials.NewStaticCredentials(cred.AccessKey, cred.SecretKey, "")
 		if err != nil {
 			awscred, err := getAWSCredential()
 			if err != nil {
