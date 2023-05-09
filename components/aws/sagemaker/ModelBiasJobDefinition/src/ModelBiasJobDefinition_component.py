@@ -14,10 +14,10 @@ import logging
 from typing import Dict
 import json
 
-from EndpointConfig.src.EndpointConfig_spec import (
-    SageMakerEndpointConfigInputs,
-    SageMakerEndpointConfigOutputs,
-    SageMakerEndpointConfigSpec,
+from ModelBiasJobDefinition.src.ModelBiasJobDefinition_spec import (
+    SageMakerModelBiasJobDefinitionInputs,
+    SageMakerModelBiasJobDefinitionOutputs,
+    SageMakerModelBiasJobDefinitionSpec,
 )
 from commonv2.sagemaker_component import (
     SageMakerComponent,
@@ -28,38 +28,40 @@ from commonv2 import snake_to_camel
 
 
 @ComponentMetadata(
-    name="SageMaker - EndpointConfig",
+    name="SageMaker - ModelBiasJobDefinition",
     description="",
-    spec=SageMakerEndpointConfigSpec,
+    spec=SageMakerModelBiasJobDefinitionSpec,
 )
-class SageMakerEndpointConfigComponent(SageMakerComponent):
+class SageMakerModelBiasJobDefinitionComponent(SageMakerComponent):
 
-    """SageMaker component for EndpointConfig."""
+    """SageMaker component for ModelBiasJobDefinition."""
 
-    def Do(self, spec: SageMakerEndpointConfigSpec):
+    def Do(self, spec: SageMakerModelBiasJobDefinitionSpec):
 
         self.namespace = self._get_current_namespace()
         logging.info("Current namespace: " + self.namespace)
 
         ############GENERATED SECTION BELOW############
 
-        self.job_name = spec.inputs.endpoint_config_name = (
-            spec.inputs.endpoint_config_name
-            if spec.inputs.endpoint_config_name
+        self.job_name = spec.inputs.job_definition_name = (
+            spec.inputs.job_definition_name
+            if spec.inputs.job_definition_name
             else SageMakerComponent._generate_unique_timestamped_id(
-                prefix="endpoint-config"
+                prefix="model-bias-job-definition"
             )
         )
 
         self.group = "sagemaker.services.k8s.aws"
         self.version = "v1alpha1"
-        self.plural = "endpointconfigs"
-        self.spaced_out_resource_name = "Endpoint Config"
+        self.plural = "modelbiasjobdefinitions"
+        self.spaced_out_resource_name = "Model Bias Job Definition"
 
         self.job_request_outline_location = (
-            "EndpointConfig/src/EndpointConfig_request.yaml.tpl"
+            "ModelBiasJobDefinition/src/ModelBiasJobDefinition_request.yaml.tpl"
         )
-        self.job_request_location = "EndpointConfig/src/EndpointConfig_request.yaml"
+        self.job_request_location = (
+            "ModelBiasJobDefinition/src/ModelBiasJobDefinition_request.yaml"
+        )
         self.update_supported = False
         ############GENERATED SECTION ABOVE############
 
@@ -67,8 +69,8 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
 
     def _create_job_request(
         self,
-        inputs: SageMakerEndpointConfigInputs,
-        outputs: SageMakerEndpointConfigOutputs,
+        inputs: SageMakerModelBiasJobDefinitionInputs,
+        outputs: SageMakerModelBiasJobDefinitionOutputs,
     ) -> Dict:
 
         return super()._create_job_yaml(inputs, outputs)
@@ -84,14 +86,10 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
         self,
         job: object,
         request: Dict,
-        inputs: SageMakerEndpointConfigInputs,
-        outputs: SageMakerEndpointConfigOutputs,
+        inputs: SageMakerModelBiasJobDefinitionInputs,
+        outputs: SageMakerModelBiasJobDefinitionOutputs,
     ):
-        logging.info(
-            "Endpoint Config in Sagemaker: https://{}.console.aws.amazon.com/sagemaker/home?region={}#/endpointConfig/{}".format(
-                inputs.region, inputs.region, self.job_name
-            )
-        )
+        pass
 
     def _get_job_status(self):
         return SageMakerJobStatus(is_completed=True, raw_status="Completed")
@@ -104,8 +102,8 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
         self,
         job: object,
         request: Dict,
-        inputs: SageMakerEndpointConfigInputs,
-        outputs: SageMakerEndpointConfigOutputs,
+        inputs: SageMakerModelBiasJobDefinitionInputs,
+        outputs: SageMakerModelBiasJobDefinitionOutputs,
     ):
         # prepare component outputs (defined in the spec)
 
@@ -129,7 +127,7 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
 if __name__ == "__main__":
     import sys
 
-    spec = SageMakerEndpointConfigSpec(sys.argv[1:])
+    spec = SageMakerModelBiasJobDefinitionSpec(sys.argv[1:])
 
-    component = SageMakerEndpointConfigComponent()
+    component = SageMakerModelBiasJobDefinitionComponent()
     component.Do(spec)
