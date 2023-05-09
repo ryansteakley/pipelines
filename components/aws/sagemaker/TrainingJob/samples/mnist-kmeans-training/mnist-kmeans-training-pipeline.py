@@ -38,23 +38,23 @@ resourceConfig = {
 }
 
 
-def training_input(s3_bucket_name):
+def training_input():
     return [
         {
             "channelName": "train",
             "dataSource": {
-                "s3DataSource": {
-                    "s3DataType": "S3Prefix",
-                    # change it to your input path of the train data: s3://<YOUR BUCKET>/mnist_kmeans_example/train_data
-                    "s3URI": f"s3://{s3_bucket_name}/mnist_kmeans_example/train_data",
-                    "s3DataDistributionType": "FullyReplicated",
-                },
+                "fileSystemDataSource": {
+                    "fileSystemID": "YOUR-FILE-SYSTEM",
+                    "fileSystemType": "EFS",
+                    "fileSystemAccessMode": "ro",
+                    "directoryPath": "mnist_kmeans_example/train_data"
+                }
             },
             "compressionType": "None",
-            "RecordWrapperType": "None",
-            "InputMode": "File",
+            "recordWrapperType": "None"
         }
     ]
+
 
 
 def training_output(s3_bucket_name):
@@ -67,7 +67,7 @@ def TrainingJob(
     sagemaker_role_arn=ROLE_ARN,
     region=REGION,
     training_image=TRAINING_IMAGE,
-    hyper_parameters={"k": "10", "feature_dim": "784"},
+    hyper_parameters={"num_round": "10"},
     resource_config={
         "instanceCount": 1,
         "instanceType": "ml.m4.xlarge",
@@ -80,10 +80,12 @@ def TrainingJob(
         enable_inter_container_traffic_encryption=False,
         enable_network_isolation=False,
         hyper_parameters=hyper_parameters,
-        input_data_config=training_input(s3_bucket_name),
+        input_data_config=training_input(),
         output_data_config=training_output(s3_bucket_name),
         resource_config=resource_config,
         role_arn=sagemaker_role_arn,
+        vpc_config={"securityGroupIDs":["YOUR-SECURITY-GROUP-IDS"],
+                    "subnets":["YOUR SUBNET IDS"]},
         stopping_condition={"maxRuntimeInSeconds": 3600},
     )
 

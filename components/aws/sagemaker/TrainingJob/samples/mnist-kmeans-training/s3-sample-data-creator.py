@@ -5,7 +5,7 @@ import boto3
 # If you are gonna use the default values of the pipeline then
 # give a bucket name which is in us-east-1 region
 
-bucket = os.getenv("S3_BUCKET_NAME", None)
+bucket = os.getenv("S3_BUCKET_NAME", "sagemaker-us-west-2-024825446905")
 if not bucket:
     raise Exception("S3_BUCKET_NAME not exported")
 

@@ -52,11 +52,16 @@ func OpenBucket(ctx context.Context, k8sClient kubernetes.Interface, namespace s
 	}()
 	if config.Scheme == "minio://" {
 		cred, err := getMinioCredential(ctx, k8sClient, namespace)
+		creds := cwwdaredentials.NewStaticCredentials(cred.AccessKey, cred.SecretKey, "")
 		if err != nil {
-			return nil, fmt.Errorf("Failed to get minio credential: %w", err)
+			awscred, err := getAWSCredential()
+			if err != nil {
+				return nil, fmt.Errorf("Failed to get minio credential: %w", err)
+			}
+			creds = awscred
 		}
 		sess, err := session.NewSession(&aws.Config{
-			Credentials:      credentials.NewStaticCredentials(cred.AccessKey, cred.SecretKey, ""),
+			Credentials:      creds,
 			Region:           aws.String("minio"),
 			Endpoint:         aws.String(MinioDefaultEndpoint()),
 			DisableSSL:       aws.Bool(true),
@@ -335,4 +340,8 @@ func getMinioCredential(ctx context.Context, clientSet kubernetes.Interface, nam
 		return cred, fmt.Errorf("does not have 'secretkey' key")
 	}
 	return cred, nil
+}
+
+func getAWSCredential() (cred *credentials.Credentials, err error) {
+	return credentials.NewCredentials(&credentials.ChainProvider{}), nil
 }
