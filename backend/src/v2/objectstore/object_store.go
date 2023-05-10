@@ -26,10 +26,13 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/golang/glog"
 	"gocloud.dev/blob"
 	_ "gocloud.dev/blob/gcsblob"
+	"gocloud.dev/blob/s3blob"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -42,7 +45,43 @@ type Config struct {
 }
 
 func OpenBucket(ctx context.Context, k8sClient kubernetes.Interface, namespace string, config *Config) (bucket *blob.Bucket, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("Failed to open bucket %q: %w", config.BucketName, err)
+		}
+	}()
+	if config.Scheme == "minio://" {
+		cred, err := getMinioCredential(ctx, k8sClient, namespace)
+		creds := credentials.NewStaticCredentials(cred.AccessKey, cred.SecretKey, "")
+		if err != nil {
+			awscred, err := getAWSCredential()
+			fmt.Println("lets go")
+			fmt.Println(awscred)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to get minio credential: %w", err)
+			}
+			creds = awscred
+		}
+		sess, err := session.NewSession(&aws.Config{
+			Credentials:      creds,
+			Region:           aws.String("minio"),
+			Endpoint:         aws.String(MinioDefaultEndpoint()),
+			DisableSSL:       aws.Bool(true),
+			S3ForcePathStyle: aws.Bool(true),
+		})
 
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create session to access minio: %v", err)
+		}
+		minioBucket, err := s3blob.OpenBucket(ctx, sess, config.BucketName, nil)
+		if err != nil {
+			return nil, err
+		}
+		// Directly calling s3blob.OpenBucket does not allow overriding prefix via bucketConfig.BucketURL().
+		// Therefore, we need to explicitly configure the prefixed bucket.
+		return blob.PrefixedBucket(minioBucket, config.Prefix), nil
+
+	}
 	return blob.OpenBucket(ctx, config.bucketURL())
 }
 
