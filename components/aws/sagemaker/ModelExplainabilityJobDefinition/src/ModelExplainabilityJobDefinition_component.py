@@ -14,10 +14,10 @@ import logging
 from typing import Dict
 import json
 
-from EndpointConfig.src.EndpointConfig_spec import (
-    SageMakerEndpointConfigInputs,
-    SageMakerEndpointConfigOutputs,
-    SageMakerEndpointConfigSpec,
+from ModelExplainabilityJobDefinition.src.ModelExplainabilityJobDefinition_spec import (
+    SageMakerModelExplainabilityJobDefinitionInputs,
+    SageMakerModelExplainabilityJobDefinitionOutputs,
+    SageMakerModelExplainabilityJobDefinitionSpec,
 )
 from commonv2.sagemaker_component import (
     SageMakerComponent,
@@ -28,38 +28,36 @@ from commonv2 import snake_to_camel
 
 
 @ComponentMetadata(
-    name="SageMaker - EndpointConfig",
+    name="SageMaker - ModelExplainabilityJobDefinition",
     description="",
-    spec=SageMakerEndpointConfigSpec,
+    spec=SageMakerModelExplainabilityJobDefinitionSpec,
 )
-class SageMakerEndpointConfigComponent(SageMakerComponent):
+class SageMakerModelExplainabilityJobDefinitionComponent(SageMakerComponent):
 
-    """SageMaker component for EndpointConfig."""
+    """SageMaker component for ModelExplainabilityJobDefinition."""
 
-    def Do(self, spec: SageMakerEndpointConfigSpec):
+    def Do(self, spec: SageMakerModelExplainabilityJobDefinitionSpec):
 
         self.namespace = self._get_current_namespace()
         logging.info("Current namespace: " + self.namespace)
 
         ############GENERATED SECTION BELOW############
 
-        self.job_name = spec.inputs.endpoint_config_name = (
-            spec.inputs.endpoint_config_name
-            if spec.inputs.endpoint_config_name
+        self.job_name = spec.inputs.job_definition_name = (
+            spec.inputs.job_definition_name
+            if spec.inputs.job_definition_name
             else SageMakerComponent._generate_unique_timestamped_id(
-                prefix="endpoint-config"
+                prefix="model-explainability-job-definition"
             )
         )
 
         self.group = "sagemaker.services.k8s.aws"
         self.version = "v1alpha1"
-        self.plural = "endpointconfigs"
-        self.spaced_out_resource_name = "Endpoint Config"
+        self.plural = "modelexplainabilityjobdefinitions"
+        self.spaced_out_resource_name = "Model Explainability Job Definition"
 
-        self.job_request_outline_location = (
-            "EndpointConfig/src/EndpointConfig_request.yaml.tpl"
-        )
-        self.job_request_location = "EndpointConfig/src/EndpointConfig_request.yaml"
+        self.job_request_outline_location = "ModelExplainabilityJobDefinition/src/ModelExplainabilityJobDefinition_request.yaml.tpl"
+        self.job_request_location = "ModelExplainabilityJobDefinition/src/ModelExplainabilityJobDefinition_request.yaml"
         self.update_supported = False
         ############GENERATED SECTION ABOVE############
 
@@ -67,8 +65,8 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
 
     def _create_job_request(
         self,
-        inputs: SageMakerEndpointConfigInputs,
-        outputs: SageMakerEndpointConfigOutputs,
+        inputs: SageMakerModelExplainabilityJobDefinitionInputs,
+        outputs: SageMakerModelExplainabilityJobDefinitionOutputs,
     ) -> Dict:
 
         return super()._create_job_yaml(inputs, outputs)
@@ -84,14 +82,10 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
         self,
         job: object,
         request: Dict,
-        inputs: SageMakerEndpointConfigInputs,
-        outputs: SageMakerEndpointConfigOutputs,
+        inputs: SageMakerModelExplainabilityJobDefinitionInputs,
+        outputs: SageMakerModelExplainabilityJobDefinitionOutputs,
     ):
-        logging.info(
-            "Endpoint Config in Sagemaker: https://{}.console.aws.amazon.com/sagemaker/home?region={}#/endpointConfig/{}".format(
-                inputs.region, inputs.region, self.job_name
-            )
-        )
+        pass
 
     def _get_job_status(self):
         return SageMakerJobStatus(is_completed=True, raw_status="Completed")
@@ -104,8 +98,8 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
         self,
         job: object,
         request: Dict,
-        inputs: SageMakerEndpointConfigInputs,
-        outputs: SageMakerEndpointConfigOutputs,
+        inputs: SageMakerModelExplainabilityJobDefinitionInputs,
+        outputs: SageMakerModelExplainabilityJobDefinitionOutputs,
     ):
         # prepare component outputs (defined in the spec)
 
@@ -129,7 +123,7 @@ class SageMakerEndpointConfigComponent(SageMakerComponent):
 if __name__ == "__main__":
     import sys
 
-    spec = SageMakerEndpointConfigSpec(sys.argv[1:])
+    spec = SageMakerModelExplainabilityJobDefinitionSpec(sys.argv[1:])
 
-    component = SageMakerEndpointConfigComponent()
+    component = SageMakerModelExplainabilityJobDefinitionComponent()
     component.Do(spec)

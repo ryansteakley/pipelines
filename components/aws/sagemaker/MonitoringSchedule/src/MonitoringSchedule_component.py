@@ -14,10 +14,10 @@ import logging
 from typing import Dict
 import json
 
-from Endpoint.src.Endpoint_spec import (
-    SageMakerEndpointInputs,
-    SageMakerEndpointOutputs,
-    SageMakerEndpointSpec,
+from MonitoringSchedule.src.MonitoringSchedule_spec import (
+    SageMakerMonitoringScheduleInputs,
+    SageMakerMonitoringScheduleOutputs,
+    SageMakerMonitoringScheduleSpec,
 )
 from commonv2.sagemaker_component import (
     SageMakerComponent,
@@ -28,34 +28,40 @@ from commonv2 import snake_to_camel
 
 
 @ComponentMetadata(
-    name="SageMaker - Endpoint",
+    name="SageMaker - MonitoringSchedule",
     description="",
-    spec=SageMakerEndpointSpec,
+    spec=SageMakerMonitoringScheduleSpec,
 )
-class SageMakerEndpointComponent(SageMakerComponent):
+class SageMakerMonitoringScheduleComponent(SageMakerComponent):
 
-    """SageMaker component for Endpoint."""
+    """SageMaker component for MonitoringSchedule."""
 
-    def Do(self, spec: SageMakerEndpointSpec):
+    def Do(self, spec: SageMakerMonitoringScheduleSpec):
 
         self.namespace = self._get_current_namespace()
         logging.info("Current namespace: " + self.namespace)
 
         ############GENERATED SECTION BELOW############
 
-        self.job_name = spec.inputs.endpoint_name = (
-            spec.inputs.endpoint_name
-            if spec.inputs.endpoint_name
-            else SageMakerComponent._generate_unique_timestamped_id(prefix="endpoint")
+        self.job_name = spec.inputs.monitoring_schedule_name = (
+            spec.inputs.monitoring_schedule_name
+            if spec.inputs.monitoring_schedule_name
+            else SageMakerComponent._generate_unique_timestamped_id(
+                prefix="monitoring-schedule"
+            )
         )
 
         self.group = "sagemaker.services.k8s.aws"
         self.version = "v1alpha1"
-        self.plural = "endpoints"
-        self.spaced_out_resource_name = "Endpoint"
+        self.plural = "monitoringschedules"
+        self.spaced_out_resource_name = "Monitoring Schedule"
 
-        self.job_request_outline_location = "Endpoint/src/Endpoint_request.yaml.tpl"
-        self.job_request_location = "Endpoint/src/Endpoint_request.yaml"
+        self.job_request_outline_location = (
+            "MonitoringSchedule/src/MonitoringSchedule_request.yaml.tpl"
+        )
+        self.job_request_location = (
+            "MonitoringSchedule/src/MonitoringSchedule_request.yaml"
+        )
         self.update_supported = True
         ############GENERATED SECTION ABOVE############
 
@@ -63,8 +69,8 @@ class SageMakerEndpointComponent(SageMakerComponent):
 
     def _create_job_request(
         self,
-        inputs: SageMakerEndpointInputs,
-        outputs: SageMakerEndpointOutputs,
+        inputs: SageMakerMonitoringScheduleInputs,
+        outputs: SageMakerMonitoringScheduleOutputs,
     ) -> Dict:
 
         return super()._create_job_yaml(inputs, outputs)
@@ -85,34 +91,25 @@ class SageMakerEndpointComponent(SageMakerComponent):
         self,
         job: object,
         request: Dict,
-        inputs: SageMakerEndpointInputs,
-        outputs: SageMakerEndpointOutputs,
+        inputs: SageMakerMonitoringScheduleInputs,
+        outputs: SageMakerMonitoringScheduleOutputs,
     ):
-        logging.info(
-            "Endpoint in Sagemaker: https://{}.console.aws.amazon.com/sagemaker/home?region={}#/endpoints/{}".format(
-                inputs.region, inputs.region, self.job_name
-            )
-        )
-        logging.info(
-            "CloudWatch logs: https://{}.console.aws.amazon.com/cloudwatch/home?region={}#logStream:group=/aws/sagemaker/Endpoints/{}".format(
-                inputs.region, inputs.region, self.job_name
-            )
-        )
+        pass
 
     def _get_job_status(self):
 
         ack_resource = super()._get_resource()
         resourceSynced = self._get_resource_synced_status(ack_resource["status"])
-        sm_job_status = ack_resource["status"]["endpointStatus"]
+        sm_job_status = ack_resource["status"]["monitoringScheduleStatus"]
         if not resourceSynced:
             return SageMakerJobStatus(
                 is_completed=False,
                 raw_status=sm_job_status,
             )
 
-        if sm_job_status == "InService":
+        if sm_job_status == "Scheduled":
             return SageMakerJobStatus(
-                is_completed=True, has_error=False, raw_status="InService"
+                is_completed=True, has_error=False, raw_status="Scheduled"
             )
 
         if sm_job_status == "Failed":
@@ -124,8 +121,8 @@ class SageMakerEndpointComponent(SageMakerComponent):
                 raw_status=sm_job_status,
             )
 
-        if sm_job_status == "OutOfService":
-            message = "Sagemaker endpoint is Out of Service"
+        if sm_job_status == "Stopped":
+            message = "The schedule was stopped."
             return SageMakerJobStatus(
                 is_completed=True,
                 has_error=True,
@@ -142,8 +139,8 @@ class SageMakerEndpointComponent(SageMakerComponent):
         self,
         job: object,
         request: Dict,
-        inputs: SageMakerEndpointInputs,
-        outputs: SageMakerEndpointOutputs,
+        inputs: SageMakerMonitoringScheduleInputs,
+        outputs: SageMakerMonitoringScheduleOutputs,
     ):
         # prepare component outputs (defined in the spec)
 
@@ -162,9 +159,6 @@ class SageMakerEndpointComponent(SageMakerComponent):
         outputs.creation_time = str(
             ack_statuses["creationTime"] if "creationTime" in ack_statuses else None
         )
-        outputs.endpoint_status = str(
-            ack_statuses["endpointStatus"] if "endpointStatus" in ack_statuses else None
-        )
         outputs.failure_reason = str(
             ack_statuses["failureReason"] if "failureReason" in ack_statuses else None
         )
@@ -173,14 +167,14 @@ class SageMakerEndpointComponent(SageMakerComponent):
             if "lastModifiedTime" in ack_statuses
             else None
         )
-        outputs.pending_deployment_summary = str(
-            ack_statuses["pendingDeploymentSummary"]
-            if "pendingDeploymentSummary" in ack_statuses
+        outputs.last_monitoring_execution_summary = str(
+            ack_statuses["lastMonitoringExecutionSummary"]
+            if "lastMonitoringExecutionSummary" in ack_statuses
             else None
         )
-        outputs.production_variants = str(
-            ack_statuses["productionVariants"]
-            if "productionVariants" in ack_statuses
+        outputs.monitoring_schedule_status = str(
+            ack_statuses["monitoringScheduleStatus"]
+            if "monitoringScheduleStatus" in ack_statuses
             else None
         )
         outputs.sagemaker_resource_name = self.job_name
@@ -191,7 +185,7 @@ class SageMakerEndpointComponent(SageMakerComponent):
 if __name__ == "__main__":
     import sys
 
-    spec = SageMakerEndpointSpec(sys.argv[1:])
+    spec = SageMakerMonitoringScheduleSpec(sys.argv[1:])
 
-    component = SageMakerEndpointComponent()
+    component = SageMakerMonitoringScheduleComponent()
     component.Do(spec)

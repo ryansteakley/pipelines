@@ -1,5 +1,5 @@
-name: "Sagemaker - Endpoint"
-description: Create Endpoint
+name: "Sagemaker - MonitoringSchedule"
+description: Create MonitoringSchedule
 inputs:
   - {
       name: region,
@@ -9,28 +9,22 @@ inputs:
   ###########################GENERATED SECTION BELOW############################
   
   - {
-      name: deployment_config,
+      name: monitoring_schedule_config,
       type: JsonObject,
       default: '{}',
-      description: "The deployment configuration for an endpoint, which contains the desired deployment strategy and rollback configurations.",
+      description: "The configuration object that specifies the monitoring schedule and defines the monitoring job.",
     }
   - {
-      name: endpoint_config_name,
+      name: monitoring_schedule_name,
       type: String,
       default: '',
-      description: "The name of an endpoint configuration.",
-    }
-  - {
-      name: endpoint_name,
-      type: String,
-      default: '',
-      description: "The name of the endpoint.",
+      description: "The name of the monitoring schedule.",
     }
   - {
       name: tags,
       type: JsonArray,
       default: '[]',
-      description: "An array of key-value pairs.",
+      description: "(Optional) An array of key-value pairs.",
     }
   ###########################GENERATED SECTION ABOVE############################
 
@@ -50,32 +44,27 @@ outputs:
   - {
       name: creation_time,
       type: String,
-      description: "A timestamp that shows when the endpoint was created.",
-    }
-  - {
-      name: endpoint_status,
-      type: String,
-      description: "The status of the endpoint.",
+      description: "The time at which the monitoring job was created.",
     }
   - {
       name: failure_reason,
       type: String,
-      description: "If the status of the endpoint is Failed, the reason why it failed.",
+      description: "A string, up to one KB in size, that contains the reason a monitoring job failed, if it failed.",
     }
   - {
       name: last_modified_time,
       type: String,
-      description: "A timestamp that shows when the endpoint was last modified.",
+      description: "The time at which the monitoring job was last modified.",
     }
   - {
-      name: pending_deployment_summary,
+      name: last_monitoring_execution_summary,
       type: JsonObject,
-      description: "Returns the summary of an in-progress deployment.",
+      description: "Describes metadata on the last execution to run, if there was one.",
     }
   - {
-      name: production_variants,
-      type: JsonArray,
-      description: "An array of ProductionVariantSummary objects, one for each model hosted behind this endpoint.",
+      name: monitoring_schedule_status,
+      type: String,
+      description: "The status of an monitoring job.",
     }
   - {
       name: sagemaker_resource_name,
@@ -89,16 +78,14 @@ implementation:
     image: public.ecr.aws/kubeflow-on-aws/aws-sagemaker-kfp-components:2.3.0
     command: [python3]
     args:
-      - Endpoint/src/Endpoint_component.py
+      - MonitoringSchedule/src/MonitoringSchedule_component.py
       - --region
       - { inputValue: region }
       ###########################GENERATED SECTION BELOW############################
-      - --deployment_config
-      - { inputValue: deployment_config }
-      - --endpoint_config_name
-      - { inputValue: endpoint_config_name }
-      - --endpoint_name
-      - { inputValue: endpoint_name }
+      - --monitoring_schedule_config
+      - { inputValue: monitoring_schedule_config }
+      - --monitoring_schedule_name
+      - { inputValue: monitoring_schedule_name }
       - --tags
       - { inputValue: tags }
       
