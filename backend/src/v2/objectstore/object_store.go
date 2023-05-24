@@ -52,18 +52,11 @@ func OpenBucket(ctx context.Context, k8sClient kubernetes.Interface, namespace s
 	}()
 	if config.Scheme == "minio://" {
 		cred, err := getMinioCredential(ctx, k8sClient, namespace)
-		creds := credentials.NewStaticCredentials(cred.AccessKey, cred.SecretKey, "")
 		if err != nil {
-			awscred, err := getAWSCredential()
-			fmt.Println("lets go")
-			fmt.Println(awscred)
-			if err != nil {
-				return nil, fmt.Errorf("Failed to get minio credential: %w", err)
-			}
-			creds = awscred
+			return nil, fmt.Errorf("Failed to get minio credential: %w", err)	
 		}
 		sess, err := session.NewSession(&aws.Config{
-			Credentials:      creds,
+			Credentials:      cred,
 			Region:           aws.String("minio"),
 			Endpoint:         aws.String(MinioDefaultEndpoint()),
 			DisableSSL:       aws.Bool(true),
@@ -314,12 +307,7 @@ func MinioDefaultEndpoint() string {
 	return defaultMinioEndpointInMultiUserMode
 }
 
-type minioCredential struct {
-	AccessKey string
-	SecretKey string
-}
-
-func getMinioCredential(ctx context.Context, clientSet kubernetes.Interface, namespace string) (cred minioCredential, err error) {
+func getMinioCredential(ctx context.Context, clientSet kubernetes.Interface, namespace string) (cred *credentials.Credentials, err error) {
 	defer func() {
 		if err != nil {
 			// wrap error before returning
@@ -331,17 +319,22 @@ func getMinioCredential(ctx context.Context, clientSet kubernetes.Interface, nam
 		minioArtifactSecretName,
 		metav1.GetOptions{})
 	if err != nil {
+		return nil, err
+	}
+	accessKey := string(secret.Data["accesskey"])
+	secretKey := string(secret.Data["secretkey"])
+
+	if accessKey != "" && secretKey != "" {
+		cred = credentials.NewStaticCredentials(accessKey, secretKey, "")
 		return cred, err
 	}
-	cred.AccessKey = string(secret.Data["accesskey"])
-	cred.SecretKey = string(secret.Data["secretkey"])
-	if cred.AccessKey == "" {
-		return cred, fmt.Errorf("does not have 'accesskey' key")
+
+	aws_cred, err := getAWSCredential()
+	if aws_cred != nil {
+		return aws_cred, err
 	}
-	if cred.SecretKey == "" {
-		return cred, fmt.Errorf("does not have 'secretkey' key")
-	}
-	return cred, nil
+
+	return nil, fmt.Errorf("does not have 'accesskey' or 'secretkey' key")
 }
 
 func getAWSCredential() (cred *credentials.Credentials, err error) {
